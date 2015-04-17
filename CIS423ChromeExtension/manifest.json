@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+    
+    "name": "Google Translate Extension",
+    "description": "This extension will access google translate's translation of desired text and send it to another process for accuracy of the translation",
+    "version": "1.0",
+    
+    "browser_action":{
+        "default_icon": "translateimage.png",
+        "default_popup": "popup.html",
+        "default_title": "Click to Begin Translating!"
+    },
+    
+    "permissions": [
+        "activeTab",
+        "https://translate.google.com/"
+    ]
+}
