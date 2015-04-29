@@ -1,1 +1,9 @@
-i
+todo:
+
+done: get dom 
+
+register click event on icon
+
+send http
+
+recive and display
