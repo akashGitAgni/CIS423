@@ -1,111 +1,55 @@
 //Imports .....
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var os = require('os');
+var express = require('express');
+var path = require('path');
 var bodyParser = require('body-parser');
-var fs = require('fs');
-var querystring = require('querystring');
-// Variables ......
-var my_ip = "";
-var port = "4000";
-// get my ip
 var PythonShell = require('python-shell');
-var ifaces = os.networkInterfaces();
-Object.keys(ifaces).forEach(function(ifname) {
-	var alias = 0;
+var http = require('http');
 
-	ifaces[ifname].forEach(function(iface) {
-		if ('IPv4' !== iface.family || iface.internal !== false) {
-			return;
-		}
+var app = express();
 
-		if (alias >= 1) {
-			my_ip = iface.address;
-		} else {
-			my_ip = iface.address;
-		}
-	});
+var server = http.createServer(app);
+
+app.set('views', path.join(path.resolve(path.dirname()), 'views'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+//Routes
+/*****************************************************/
+
+app.get('/home', function(req, res) {
+        res.render('home.html');
 });
 
-app.use(bodyParser.urlencoded());
-console.log("Server Started-------");
-app.set('port', process.env.PORT || port);
-// function for UI ..
+app.post('/run', function(req, res) {
 
-app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/factory.html');
-});
+        var first = req.body.first;
+        var second = req.body.second;
 
-app.get('/getResult', function(req, res) {
-	res.sendFile(__dirname + '/factory.html');
-	console.log("Getting acuracy");
+        var pyshell = new PythonShell('test.py', {mode: 'text'});
 
-	var pyshell = new PythonShell('myscript.py');
+        pyshell.send(first);
+        pyshell.send(second);
 
-	// sends a message to the Python script via stdin
-	pyshell.send('hello');
+        pyshell.on('message', function(message) {
+                console.log(message);
+                res.end(message);
+        });
 
-	pyshell.on('message', function(message) {
-		// received a message sent from the Python script (a simple "print"
-		// statement)
-		console.log(message);
-	});
-
-	// end the input stream and allow the process to exit
-	pyshell.end(function(err) {
-		if (err)
-			throw err;
-		console.log('finished');
-	});
+        pyshell.end(function(err) {
+                if(err) throw err;
+                console.log('finished');
+        });
 
 });
 
-var socketobj;
-io.on('connection', function(socket) {
-	socketobj = socket;
-	socket.emit('connect', {
-		hello : 'world'
-	});
+/*****************************************************/
 
-	// reply from the page ...
-	socket.on('AddTask', function(data) {
-	});
-
-	socket.on('AddSensorTask', function(data) {
-	});
-
+app.listen(3000, function() {
+        console.log('Listening on port 3000...');
 });
 
-function updateBag(msg) {
-	if (socketobj == undefined)
-		return;
+//server.listen(8080, '128.223.4.35');
 
-	socketobj.emit('Bag', {
-		msg : msg
-	});
-
-}
-
-http.listen(3000, function() {
-});
-
-app.post('/do_post', function(req, res) {
-	var the_body = req.body;
-	res.json({
-		"body" : the_body,
-		"ip" : JSON.stringify(my_ip)
-	});
-
-});
-
-app.post('/getAccuracy', function(req, res) {
-	// get the bay id for this sensor
-	var the_body = req.body;
-	console.log("Getting acuracy");
-
-});
-
-process.on('uncaughtException', function(err) {
-	console.log('Caught exception: ' + err);
-});
+module.exports = app;
