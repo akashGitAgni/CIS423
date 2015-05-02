@@ -24,11 +24,9 @@ app.get('/home', function(req, res) {
 	res.render('Example.html');
 });
 
-
 app.get('/results', function(req, res) {
-	processResults(req,res);
+	processResults(req, res,false);
 });
-
 
 function writeOuputFile(text) {
 
@@ -42,17 +40,22 @@ function writeOuputFile(text) {
 
 }
 
+function processResults(req, res, post) {
 
-function processResults(req,res)
-{
+	var fist = ""
+	var second = "";
+	if (post) {
+		first = req.body.first;
+		second = req.body.second;
+	} else {
+		first = req.query.first;
+		second = req.query.second;
+	}
 
-	console.log("in app post");
-	var first = req.body.first;
-	var second = req.body.second;
 	var path = "test-input.txt";
 	var string = first + "\n" + second;
 	// writeOuputFile(string);
-
+	console.log("-" + first + " -" + second);
 	var options = {
 		mode : 'text',
 		scriptPath : './',
@@ -75,10 +78,9 @@ function processResults(req,res)
 
 }
 
-
 app.post('/run', function(req, res) {
 
-	
+	processResults(req, res,true);
 
 });
 
