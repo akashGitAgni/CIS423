@@ -14,7 +14,7 @@
     "content_scripts" : [
         {
             "matches": ["https://translate.google.com/*",  "http://translate.google.com/*"],
-            "js": ["app.js", "jquery-2.1.4.min.js"]
+            "js": ["jquery-2.1.4.min.js", "app.js"]
         }
     ],
     
