@@ -1,4 +1,6 @@
 //Imports .....
+//cis423#2!
+//server#2!
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
@@ -7,7 +9,18 @@ var http = require('http');
 var fs = require('fs');
 var app = express();
 
-var server = http.createServer(app);
+
+
+var https = require('https');
+
+var sslOptions = {
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt'),
+  ca: fs.readFileSync('./ca.crt'),
+  requestCert: true,
+  rejectUnauthorized: false
+};
+
 
 app.set('views', path.join(path.resolve(path.dirname()), 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -86,10 +99,12 @@ app.post('/run', function(req, res) {
 
 /** ************************************************** */
 
-app.listen(3000, function() {
-	console.log('Listening on port 3000...');
+module.exports = app;
+
+var secureServer = https.createServer(sslOptions,app).listen('3000', function(){
+  console.log("Secure Express server listening on port 3000");
 });
+
 
 // server.listen(8080, '128.223.4.35');
 
-module.exports = app;
