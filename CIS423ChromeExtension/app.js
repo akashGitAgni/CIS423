@@ -1,5 +1,4 @@
 
-
 getSource = function(){return $(document.all[0]).find("#source").val()};
 getTranslation = function(){
 	val = "";
@@ -8,6 +7,10 @@ getTranslation = function(){
 	});
 	return val;
 };
+
+checkLanguage = function(){
+	return false;
+}
 
 
 // utility & testing functions
@@ -21,9 +24,42 @@ testFunctions = function(){
 }
 // testFunctions();
 
-queryValidator = function(){
-	return "validity:" + "10%";
+queryValidator = function(i,o){
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+ 
+	if(window.XDomainRequest) //for IE8,IE9
+	    contentType = "text/plain";
+	 
+	$.ajax({
+	     url:"https://localhost:3000/results?first=" + getSource() + "&second=" + getTranslation() ,
+	     type:"GET",
+	     contentType:contentType,    
+	     success:function(data)
+	     {
+	        alert("Data from Server"+JSON.stringify(data));
+	     },
+	     error:function(jqXHR,textStatus,errorThrown)
+	     {
+	        alert("BAD!! "+errorThrown);
+	     }
+    });
 }
 
 
-alert( queryValidator(getSource(), getTranslation()) );
+
+
+// alert( queryValidator(getSource(), getTranslation()) );
+// 
+
+
+
+// addButton(){
+// 	button = $("body #gt-lang-submit").html();
+// 	("body #gt-lang-submit").insertAfter(button);
+// }
+// 
+// 
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    queryValidator(getSource(), getTranslation());
+});
