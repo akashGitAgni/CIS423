@@ -29,11 +29,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended : false
 }));
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
 
 // Routes
 /** ************************************************** */
@@ -43,6 +38,7 @@ app.get('/home', function(req, res) {
 });
 
 app.get('/results', function(req, res) {
+	console.log("Get Recieved ..");
 	processResults(req, res,false);
 });
 
@@ -58,29 +54,56 @@ function writeOuputFile(text) {
 
 }
 
+/*
+ * 
+ * #junk -> name of this python file, not needed but automatically passed by interpreter 
+	#srcTxt -> source text user translated
+	#dstTxt -> translated text
+	#srcLng -> language of source txt
+	#dstTtxt -> language source text was translated to
+	#srcTxt, dstTxt, srcLng, dstLng = loadData(argv[1], '../input', '\n', str); #use this interface for basic testing
+	junk, srcTxt, dstTxt, srcLng, dstLng = argv; #use this interface for production
+ * 
+ * 
+ * localhost:3000/results?srcTxt="hello"&dstTxt ="hello"&srcLang="English"&dstLang = "English"
+ * */
+
 function processResults(req, res, post) {
 
-	var fist = ""
-	var second = "";
+	console.log("Processing results..");
+	var srcTxt = "";
+	var dstTxt = "";
+	var srcLang = "";
+	var dstLang = "";
 	if (post) {
-		first = req.body.first;
-		second = req.body.second;
+		srcTxt = req.body.srcTxt;
+		dstTxt = req.body.dstTxt;
+		srcLang = req.body.srcLang;
+		dstLang = req.body.dstLang;
 	} else {
-		first = req.query.first;
-		second = req.query.second;
-	}
+		srcTxt = req.query.srcTxt;
+		dstTxt = req.query.dstTxt;
+		if (typeof req.query.srcLang != 'undefined')
+			srcLang = req.query.srcLang;
+		else
+			srcLang = "english";
 
-	var path = "test-input.txt";
-	var string = first + "\n" + second;
-	// writeOuputFile(string);
-	console.log("-" + first + " -" + second);
+		if (typeof req.query.dstLang != 'undefined')
+			dstLang = req.query.dstLang;
+		else
+			dstLang = "russian";
+	}
+	
+	console.log("Calling Engine with :" +srcTxt +" "+ dstTxt+" "+srcLang+" "+dstLang);
+
+
 	var options = {
 		mode : 'text',
 		scriptPath : './',
-		args : [ second, first ]
+		args : [ srcTxt, dstTxt,srcLang,dstLang]
 	};
 
-	var pyshell = new PythonShell('engine.py', options);
+	var pyshell = new PythonShell('./engine.py', options);
 
 	pyshell.on('message', function(message) {
 		console.log("---------------------");
@@ -98,6 +121,7 @@ function processResults(req, res, post) {
 
 app.post('/run', function(req, res) {
 
+	console.log("Post Recieved ..");
 	processResults(req, res,true);
 
 });

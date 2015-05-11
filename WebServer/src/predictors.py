@@ -36,20 +36,16 @@ def normalize(data):
 	return norm, mu, sig;
 
 class NaiveBayes(object):
-	def __init__(self, summaries = None):
-		'If creating an empty constructor, pass no arguments \
-		otherwise you can pass already summarized training data for \
-		making predictions.'
-		if summaries is not None:
-			self.summaries = summaries;
+	def __init__(self):
+		self.summaries = 0;
+		self.db = {}; #dictonary database of additonal information for classification and prediction
 
 	def separateByClass(self, data):
 		'separates training data by their outcome class and creates a dictonar \
 		 where the class is the key, and training examples are items'
 
 		partedClasses = {} #partition data by their respective outcome class (last column)
-		for i in range( len(data) ):
-			dat = data[i];
+		for dat in data:
 			if dat[-1] not in partedClasses:
 				partedClasses[ dat[-1] ] = [] #create a dictionary entry for the new class type
 			partedClasses[ dat[-1] ].append( dat[:-1] ) #append values for features
@@ -73,8 +69,9 @@ class NaiveBayes(object):
 
 	def calcProbability(slef, x, mu, sig): #formula is gaussian probability density function
 		'computes the probability of a single feature to occur'
+		#print x, mu, sig;
 		exponent = exp( -( pow(x-mu, 2) / ( 2*pow(sig, 2) ) ) );
-		return (1 / (sqrt(2*pi) * sig)) * exponent;
+		return (1 / (sqrt(2.0*pi) * sig)) * exponent;
 
 	def calcClassProbabilities(self, inputVector):
 		'computes probability of all class to occur for the given feature values'
@@ -93,6 +90,7 @@ class NaiveBayes(object):
 		probabilities = self.calcClassProbabilities(inputVector);
 		label, maxProb = None, 0;
 		for classVal, prob in probabilities.iteritems():
+			#print classVal, prob;
 			if prob > maxProb:
 				label = classVal;
 				maxProb = prob;
