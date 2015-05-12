@@ -130,7 +130,7 @@ app.post('/run', function(req, res) {
 
 module.exports = app;
 
-var secureServer = https.createServer(sslOptions,app).listen('3000', function(){
+var secureServer = http.createServer(app).listen('3000', function(){
   console.log("Secure Express server listening on port 3000");
 });
 
