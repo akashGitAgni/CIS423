@@ -29,10 +29,11 @@ queryValidator = function(i,o){
  
 	if(window.XDomainRequest) //for IE8,IE9
 	    contentType = "text/plain";
+
 chrome.runtime.sendMessage({
 	method: 'GET',
     action: 'xhttp',
-    url: 'http://ix.cs.uoregon.edu:3898/results?srcTxt='+getSource()+'&dstTxt='+getTranslation()
+    url: 'http://localhost:3000/results?srcTxt='+getSource()+'&dstTxt='+getTranslation()
     //data:{srcTxt: ""+getSource(), dstTxt: ""+getTranslation()}
 }, function(responseText) {
     alert(JSON.stringify(responseText));
