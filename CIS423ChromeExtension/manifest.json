@@ -26,6 +26,8 @@
     
     "permissions": [
         "activeTab",
-        "https://translate.google.com/"
+        "https://translate.google.com/",
+        "http://*/"
     ]
+    
 }

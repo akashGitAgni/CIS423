@@ -29,9 +29,29 @@ queryValidator = function(i,o){
  
 	if(window.XDomainRequest) //for IE8,IE9
 	    contentType = "text/plain";
-	 
+chrome.runtime.sendMessage({
+	method: 'GET',
+    action: 'xhttp',
+    url: 'http://ix.cs.uoregon.edu:3898/results?srcTxt='+getSource()+'&dstTxt='+getTranslation()
+    //data:{srcTxt: ""+getSource(), dstTxt: ""+getTranslation()}
+}, function(responseText) {
+    alert(JSON.stringify(responseText));
+   
+});
+/*
+	chrome.runtime.sendMessage({
+    method: 'POST',
+    action: 'xhttp',
+    url: 'http://localhost:3000/run',
+    data:{srcTxt: ""+getSource(), dstTxt: ""+getTranslation()}
+}, function(responseText) {
+    alert(responseText);
+   
+});
+*/
+	/* 
 	$.ajax({
-	     url:"https://localhost:3000/results?first=" + getSource() + "&second=" + getTranslation() ,
+	     url:"http://localhost:3000/results?first=" + getSource() + "&second=" + getTranslation() ,
 	     type:"GET",
 	     contentType:contentType,    
 	     success:function(data)
@@ -43,6 +63,7 @@ queryValidator = function(i,o){
 	        alert("BAD!! "+errorThrown);
 	     }
     });
+*/
 }
 
 
