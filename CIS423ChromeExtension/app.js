@@ -8,8 +8,27 @@ getTranslation = function(){
 	return val;
 };
 
-checkLanguage = function(){
-	return false;
+getLanguages = function(){
+	lang1 = "";
+	lang2 = "";
+	lang1 = $($(".jfk-button-checked")[0]).html();
+	lang2 = $($(".jfk-button-checked")[1]).html();
+	langArray = [lang1, lang2];
+	console.log(lang1);
+	console.log(lang2);
+	return langArray;
+}
+checkLanguages = function(){
+	langList = getLanguages();
+	if (langList[0] == "English"){
+		if(langList[1] == "Russian" || langList[1] == "English" || langList[1] == "Chinese" || langList[1] == "Yoruba" || langList[1] == "Telugu" || langList[1] == "Sinhala"){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	return false;	
 }
 
 
@@ -30,15 +49,25 @@ queryValidator = function(i,o){
 	if(window.XDomainRequest) //for IE8,IE9
 	    contentType = "text/plain";
 
-chrome.runtime.sendMessage({
-	method: 'GET',
-    action: 'xhttp',
-    url: 'http://localhost:3000/results?srcTxt='+getSource()+'&dstTxt='+getTranslation()
-    //data:{srcTxt: ""+getSource(), dstTxt: ""+getTranslation()}
-}, function(responseText) {
-    alert(JSON.stringify(responseText));
-   
-});
+	if (checkLanguages()){
+		chrome.runtime.sendMessage({
+			method: 'GET',
+	    	action: 'xhttp',
+	    	url: 'http://localhost:3000/results?srcTxt='+getSource()+'&dstTxt='+getTranslation()+'&srcLang='+checkLanguages()[0]+'&dstLang='+checkLanguages[1]
+	    	//data:{srcTxt: ""+getSource(), dstTxt: ""+getTranslation()}
+		}, function(responseText) {
+			responseText = responseText.substring(1, responseText.length -1);
+			responseText = responseText.replace(/["'"]+/g, '')
+	    	// repsonseText = responseText.split(",");
+	    	responseArray = responseText.split(",");
+	    	console.log(responseArray);
+
+			alert("Predicted translation type: " + responseArray[0] + " prediction\n" + "Prediction confidence percentage: " + responseArray[1] + "% prob\n" + "Classifier's word-to-word equivalence threshold percentage " + responseArray[2] + "%\n");
+
+		});
+	}else{
+		alert('nonononononon!');
+	}
 /*
 	chrome.runtime.sendMessage({
     method: 'POST',
